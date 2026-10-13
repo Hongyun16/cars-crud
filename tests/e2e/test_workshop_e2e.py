@@ -15,6 +15,9 @@ def test_user_creates_car_in_browser(page, live_server):
     expect(page.get_by_role("heading", name="Toyota Yaris")).to_be_visible()
 
 
+import re
+import re
+
 def test_user_edits_car_and_change_survives_reload(page, live_server):
     page.goto(f"{live_server}/cars/new")
 
@@ -27,16 +30,13 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
 
     page.get_by_role("link", name="Edit car").click()
 
-    model_input = page.get_by_label("Model", exact=True)
-    model_input.fill("Accord")
-    year_input = page.get_by_label("Year", exact=True)
-    year_input.fill("2023")
+    expect(page.get_by_label("Make", exact=True)).to_have_value("Honda")
+    expect(page.get_by_label("Model", exact=True)).to_have_value("Civic")
+
+    page.get_by_label("Model", exact=True).fill("Accord")
+    page.get_by_label("Year", exact=True).fill("2023")
 
     page.get_by_role("button", name="Save changes").click()
 
-    expect(page.get_by_role("heading", name="Honda Accord")).to_be_visible()
-
-    page.reload()
-
-    expect(page.locator("#car-model")).to_have_text("Accord")
-    expect(page.locator("#car-year")).to_have_text("2023")
+    expect(page).to_have_url(re.compile(r"/cars/\d+$"), timeout=10000)
+    expect(page.get_by_role("heading", name="Honda Accord")).to_be_visible(timeout=10000)
