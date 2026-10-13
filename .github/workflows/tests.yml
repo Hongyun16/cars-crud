@@ -25,7 +25,7 @@ jobs:
           playwright install chromium
 
       - name: Run all pytest tests
-        run: pytest -v
+        run: python -m pytest -v
 
   publish:
     needs: tests
